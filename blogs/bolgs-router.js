@@ -1,12 +1,10 @@
 const router = require('express').Router();
 
-const posts = require('./bolgs-router');
+const posts = require('../data/db');
 
 router.get('/', (req, res) => {
-  const query = req.query;
-
   posts
-    .find(query)
+    .find()
     .then(blogs => {
       res.status(200).json(blogs);
     })
@@ -14,7 +12,7 @@ router.get('/', (req, res) => {
       console.log(error);
       res
         .status(500)
-        .json({ error: 'The posts information could not be retrieved.' });
+        .json({ error: 'The post information could not be retrieved.' });
     });
 });
 
@@ -35,6 +33,24 @@ router.get('/:id', (req, res) => {
       res
         .status(500)
         .json({ error: 'The post information could not be retrieved.' });
+    });
+});
+
+router.delete('/:id', (req, res) => {
+  posts
+    .remove(req.params.id)
+    .then(count => {
+      if (count > 0) {
+        res.status(200).json({ message: 'The user was deleted' });
+      } else {
+        res
+          .status(400)
+          .json({ message: 'The post with the specified ID does not exist.' });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ error: 'The post could not be removed' });
     });
 });
 
